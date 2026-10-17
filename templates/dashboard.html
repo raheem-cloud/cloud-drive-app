@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudDrive | File Management System</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: #060913; color: #f8fafc; min-height: 100vh; padding: 24px; }
+        .header { display: flex; justify-content: space-between; align-items: center; max-width: 1100px; margin: 0 auto 30px; }
+        .brand { font-size: 1.4rem; font-weight: 700; color: #38bdf8; }
+        .user-panel { display: flex; align-items: center; gap: 16px; }
+        .logout-btn { padding: 6px 14px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #f87171; border-radius: 6px; text-decoration: none; font-size: 0.85rem; }
+        .main-container { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+        .upload-card { background: rgba(15, 23, 42, 0.6); border: 2px dashed rgba(56, 189, 248, 0.4); border-radius: 12px; padding: 26px; text-align: center; }
+        .upload-form { display: flex; justify-content: center; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 12px; }
+        .upload-input { color: #94a3b8; }
+        .btn-upload { background: #0284c7; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .table-card { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(148, 163, 184, 0.15); border-radius: 12px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 14px 18px; border-bottom: 1px solid rgba(148, 163, 184, 0.1); font-size: 0.9rem; }
+        th { color: #94a3b8; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+        .actions { display: flex; gap: 10px; }
+        .btn-action { text-decoration: none; font-size: 0.8rem; padding: 5px 10px; border-radius: 4px; display: inline-block; }
+        .btn-download { background: #0284c7; color: #fff; }
+        .btn-share { background: #059669; color: #fff; cursor: pointer; border: none; }
+        .btn-delete { background: #dc2626; color: #fff; border: none; cursor: pointer; }
+        .empty { padding: 40px; text-align: center; color: #64748b; }
+        .flash { padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.85rem; text-align: center; }
+        .flash.success { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
+        .flash.error { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="brand">CloudDrive Console</div>
+        <div class="user-panel">
+            <span>User: <strong>{{ username }}</strong></span>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Sign Out</a>
+        </div>
+    </div>
+
+    <div class="main-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, msg in messages %}
+                    <div class="flash {{ category }}">{{ msg }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="upload-card">
+            <h3>Upload Files to Cloud Storage</h3>
+            <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data" class="upload-form">
+                <input type="file" name="file" required class="upload-input">
+                <button type="submit" class="btn-upload">Upload to Cloud</button>
+            </form>
+        </div>
+
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Size</th>
+                        <th>Type</th>
+                        <th>Uploaded On</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if files %}
+                        {% for f in files %}
+                        <tr>
+                            <td><strong>{{ f.filename }}</strong></td>
+                            <td>{{ (f.file_size / 1024)|round(2) }} KB</td>
+                            <td>{{ f.content_type }}</td>
+                            <td>{{ f.uploaded_at }}</td>
+                            <td class="actions">
+                                <a href="{{ url_for('download', file_id=f.id) }}" class="btn-action btn-download">Download</a>
+                                <button onclick="copyShareLink('{{ f.share_token }}')" class="btn-action btn-share">Copy Link</button>
+                                <form action="{{ url_for('delete_file', file_id=f.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Delete this file?');">
+                                    <button type="submit" class="btn-action btn-delete">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="empty">No files uploaded yet. Upload your first file above.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function copyShareLink(token) {
+            const shareUrl = window.location.origin + "/share/" + token;
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                alert("Direct share link copied to clipboard:\n" + shareUrl);
+            });
+        }
+    </script>
+</body>
+</html>
