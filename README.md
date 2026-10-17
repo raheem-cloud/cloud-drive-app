@@ -5,7 +5,7 @@ A scalable web-based cloud storage application built with Python Flask and SQLit
 ## 🚀 Live Demo
 - **Public URL:** [http://13.235.76.168:8080](http://13.235.76.168:8080)
 - **Deployment Platform:** AWS EC2 (Ubuntu Linux)
-- <img width="1917" height="1015" alt="Screenshot 2026-10-17 152909" src="https://github.com/user-attachments/assets/59275929-b402-4218-bb8a-22e960bf2f98" />
+<img width="1917" height="1015" alt="Screenshot 2026-10-17 152909" src="https://github.com/user-attachments/assets/59275929-b402-4218-bb8a-22e960bf2f98" />
 <img width="1917" height="1016" alt="Screenshot 2026-10-17 152929" src="https://github.com/user-attachments/assets/8feae61b-6451-4a86-9a36-363d0177a266" />
 
 
